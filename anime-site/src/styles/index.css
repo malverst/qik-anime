@@ -1008,6 +1008,9 @@ input {
   z-index: 295;
   height: 62px;
   border-radius: 28px;
+  transform: translateZ(0);
+  will-change: transform;
+  -webkit-transform: translateZ(0);
 }
 .glass-nav-surface .glass-surface__content {
   padding: 0;
@@ -1035,37 +1038,13 @@ input {
   border-radius: 24px;
   pointer-events: none;
   z-index: 0;
-  /* glass body with subtle gradient */
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.16) 0%,
-    rgba(255, 255, 255, 0.08) 60%,
-    rgba(255, 255, 255, 0.04) 100%
-  );
-  /* layered shadows for realistic depth */
+  background: rgba(255, 255, 255, 0.12);
   box-shadow:
-    inset 0 0.5px 0 rgba(255, 255, 255, 0.35),
-    inset 0 -0.5px 0 rgba(0, 0, 0, 0.1),
-    0 4px 16px rgba(0, 0, 0, 0.25),
-    0 0 0 0.5px rgba(255, 255, 255, 0.08);
-  /* subtle distortion feel */
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.5),
+    inset 0 1px 2px rgba(255, 255, 255, 0.15),
+    inset 0 -0.5px 0 rgba(0, 0, 0, 0.15),
+    0 2px 8px rgba(0, 0, 0, 0.15);
   will-change: left, width;
-}
-/* droplet highlight — curved bright reflection at the top */
-.glass-droplet::after {
-  content: '';
-  position: absolute;
-  top: 4px;
-  left: 10px;
-  right: 10px;
-  height: 35%;
-  border-radius: 50%;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.25) 0%,
-    rgba(255, 255, 255, 0.03) 100%
-  );
-  filter: blur(3px);
 }
 
 /* ---- item ----------------------------------------------------------- */
@@ -1136,24 +1115,12 @@ input {
 
 /* ---- light theme ---------------------------------------------------- */
 [data-theme='light'] .glass-droplet {
-  background: linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0.08) 0%,
-    rgba(0, 0, 0, 0.03) 60%,
-    rgba(0, 0, 0, 0.01) 100%
-  );
+  background: rgba(0, 0, 0, 0.06);
   box-shadow:
-    inset 0 0.5px 0 rgba(255, 255, 255, 0.7),
-    inset 0 -0.5px 0 rgba(0, 0, 0, 0.04),
-    0 4px 12px rgba(0, 0, 0, 0.06),
-    0 0 0 0.5px rgba(0, 0, 0, 0.05);
-}
-[data-theme='light'] .glass-droplet::after {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.6) 0%,
-    rgba(255, 255, 255, 0.1) 100%
-  );
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.9),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4),
+    inset 0 -0.5px 0 rgba(0, 0, 0, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 /* ---------- mobile bottom navigation ---------- */

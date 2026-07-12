@@ -7,7 +7,6 @@ import GlassSurface from './GlassSurface.jsx'
 function Droplet({ navRef, activeKey }) {
   const dropletRef = useRef(null)
   const prevKey = useRef(activeKey)
-  const timerRef = useRef(null)
 
   useEffect(() => {
     if (!navRef.current || !activeKey) return
@@ -24,38 +23,16 @@ function Droplet({ navRef, activeKey }) {
     const isJump = prevKey.current && prevKey.current !== activeKey
     prevKey.current = activeKey
 
-    // Cancel any pending phase-2 timer
-    if (timerRef.current) clearTimeout(timerRef.current)
-
     if (isJump) {
-      // Phase 1 — stretch: widen and flatten slightly, shift toward target
-      const dir = targetLeft > targetWidth * 0.5 ? 1 : -1
-      const stretchLeft = targetLeft - dir * targetWidth * 0.25
-      const stretchW = targetWidth * 1.35
-      const stretchRadius = 17 // slightly flattened
-
       animate(drop,
-        { left: stretchLeft, width: stretchW, borderRadius: stretchRadius },
-        { duration: 0.3, ease: [0.33, 0, 0.1, 1] }
+        { left: targetLeft, width: targetWidth },
+        { duration: 0.35, ease: [0.25, 0, 0.35, 1] }
       )
-
-      // Phase 2 — settle: spring to exact position, size, and fully round pill
-      timerRef.current = setTimeout(() => {
-        animate(drop,
-          { left: targetLeft, width: targetWidth, borderRadius: 24 },
-          { type: 'spring', stiffness: 45, damping: 14, mass: 1.3 }
-        )
-      }, 240)
     } else {
-      // Initial mount — place at target without animation
       drop.style.left = `${targetLeft}px`
       drop.style.width = `${targetWidth}px`
-      drop.style.borderRadius = '24px'
     }
 
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current)
-    }
   }, [activeKey, navRef])
 
   return <div ref={dropletRef} className="glass-droplet" />

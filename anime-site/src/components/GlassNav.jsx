@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from 'react'
 import { animate } from 'motion/react'
+import GlassSurface from './GlassSurface.jsx'
 
 // ---- droplet ---------------------------------------------------------------
 
@@ -96,16 +97,35 @@ export default function GlassNav({ items, activeKey, iconOnly }) {
   }, [])
 
   return (
-    <nav className={`glass-nav${iconOnly ? ' icon-only' : ''}`} ref={navRef}>
-      {mounted && <Droplet navRef={navRef} activeKey={activeKey} />}
-      {items.map((item) => (
-        <NavItem
-          key={item.key}
-          item={item}
-          active={item.key === activeKey}
-          onClick={item.onClick}
-        />
-      ))}
-    </nav>
+    <GlassSurface
+      width="auto"
+      height={62}
+      borderRadius={28}
+      borderWidth={0.06}
+      brightness={50}
+      opacity={0.75}
+      blur={14}
+      displace={3}
+      backgroundOpacity={0.1}
+      saturation={1.5}
+      distortionScale={-140}
+      redOffset={0}
+      greenOffset={8}
+      blueOffset={16}
+      mixBlendMode="screen"
+      className="glass-nav-surface"
+    >
+      <nav className={`glass-nav${iconOnly ? ' icon-only' : ''}`} ref={navRef}>
+        {mounted && <Droplet navRef={navRef} activeKey={activeKey} />}
+        {items.map((item) => (
+          <NavItem
+            key={item.key}
+            item={item}
+            active={item.key === activeKey}
+            onClick={item.onClick}
+          />
+        ))}
+      </nav>
+    </GlassSurface>
   )
 }

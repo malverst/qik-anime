@@ -1057,10 +1057,8 @@ input {
   align-items: center;
   justify-content: center;
   gap: 3px;
-  color: rgba(255, 255, 255, 0.65);
   font-size: 11px;
   font-weight: 600;
-  transition: color 0.25s ease;
   position: relative;
   z-index: 1;
   background: none;
@@ -1070,38 +1068,44 @@ input {
   font-family: inherit;
   -webkit-tap-highlight-color: transparent;
 }
+.glass-nav-item.active {
+  opacity: 1;
+}
+.glass-nav-item:not(.active) {
+  opacity: 0.55;
+}
 .glass-nav-item svg {
   width: 19px;
   height: 19px;
   flex-shrink: 0;
   transition: transform 0.25s ease;
   stroke-width: 2.5;
-}
-.glass-nav-item.active {
   color: #fff;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
 }
 .glass-nav-item.active svg {
-  color: #fff;
   transform: scale(1.06);
 }
 
-[data-theme='light'] .glass-nav-item {
-  color: rgba(0, 0, 0, 0.55);
-}
-[data-theme='light'] .glass-nav-item.active {
+[data-theme='light'] .glass-nav-item svg {
   color: #000;
-}
-[data-theme='light'] .glass-nav-item.active svg {
-  color: #000;
+  filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.5));
 }
 [data-theme='light'] .glass-nav-label {
-  color: rgba(0, 0, 0, 0.55);
+  color: #000;
 }
 .glass-nav-label {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme='light'] .glass-nav-label {
+  color: #000;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
 }
 /* icon-only mode */
 .glass-nav.icon-only .glass-nav-label,
@@ -2536,9 +2540,9 @@ input {
   border: 2px solid var(--bg);
 }
 .notif-menu {
-  position: fixed;
-  top: 60px;
-  right: 12px;
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
   width: 340px;
   max-width: calc(100vw - 24px);
   background: var(--bg-soft);

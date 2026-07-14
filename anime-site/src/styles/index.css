@@ -1127,6 +1127,108 @@ input {
     0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
+/* ---------- qiki mascot ---------- */
+.qiki-mascot {
+  position: absolute;
+  right: 12px;
+  top: -115px;
+  width: 160px;
+  height: 200px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 5;
+}
+.qiki-mascot .qiki-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom right;
+  transition: opacity 0.4s ease;
+}
+.qiki-mascot .qiki-img--hover {
+  opacity: 0;
+}
+.qiki-mascot .qiki-img--visible {
+  opacity: 1;
+}
+.qiki-mascot img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom right;
+}
+.qiki-img {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.4s ease;
+}
+.qiki-img--hover {
+  opacity: 0;
+}
+.qiki-img--visible {
+  opacity: 1;
+}
+.qiki-tooltip {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 350;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fade 0.2s ease;
+  padding: 20px;
+}
+.qiki-tooltip-inner {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 28px 24px 20px;
+  max-width: 380px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
+  animation: qikiIn 0.3s ease;
+}
+@keyframes qikiIn {
+  from { opacity: 0; transform: scale(0.9) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.qiki-tooltip-close {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  background: none;
+  border: none;
+  color: var(--text-faint);
+  font-size: 22px;
+  cursor: pointer;
+  line-height: 1;
+}
+.qiki-tooltip-close:hover { color: var(--text); }
+.qiki-tooltip-img {
+  width: 200px;
+  height: 240px;
+  object-fit: contain;
+  margin: 0 auto 12px;
+  display: block;
+}
+.qiki-tooltip-inner h3 {
+  margin: 0 0 10px;
+  font-size: 20px;
+}
+.qiki-tooltip-inner p {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
 /* ---------- mobile bottom navigation ---------- */
 .mobile-bottom-nav {
   display: none;
@@ -3172,6 +3274,7 @@ input {
   border: 1px solid var(--border);
   background: var(--surface);
   padding: 28px;
+  margin-top: 80px;
   margin-bottom: 26px;
 }
 .profile-banner:not(.has-image)::before {

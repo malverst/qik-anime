@@ -210,6 +210,7 @@ export default function Profile() {
             style={{ backgroundImage: `url(${uploadUrl(shownBanner)})` }}
           />
         )}
+        <QikiMascot />
         {isSelf && editing && (
           <button
             className="banner-edit-btn"
@@ -492,7 +493,47 @@ export default function Profile() {
       >
         <Comments profileUserId={uid} />
       </ProfileSection>
+
     </div>
+  )
+}
+
+function QikiMascot() {
+  const [open, setOpen] = useState(false)
+  const [hovered, setHovered] = useState(false)
+  return (
+    <>
+      <button
+        className="qiki-mascot"
+        onClick={() => setOpen(!open)}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        aria-label="Маскот Qiki"
+        title="Кто это?"
+      >
+        <img src="/qiki-sitting.png" alt="Qiki" className="qiki-img" />
+        <img
+          src="/qiki-sitting-hover.png"
+          alt="Qiki"
+          className={`qiki-img qiki-img--hover${hovered ? ' qiki-img--visible' : ''}`}
+        />
+      </button>
+      {open && (
+        <div className="qiki-tooltip" onClick={() => setOpen(false)}>
+          <div className="qiki-tooltip-inner" onClick={(e) => e.stopPropagation()}>
+            <button className="qiki-tooltip-close" onClick={() => setOpen(false)}>×</button>
+            <img src="/qiki.png" alt="Qiki" className="qiki-tooltip-img" />
+            <h3>Это Qiki!</h3>
+            <p>
+              Привет! Я Qiki — маскот этого сайта. Я помогаю делать QIK Anime уютным и весёлым местом для всех любителей аниме.
+            </p>
+            <p>
+              Я слежу за тем, чтобы сайт работал быстро, а ты мог легко находить любимые тайтлы, оценивать опенинги и собирать достижения.
+            </p>
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 

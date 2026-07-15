@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -11,6 +11,7 @@ import { ApiTokenGuard } from './api-token.guard';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { CompositeAuthGuard } from './composite-auth.guard';
 
+@Global()
 @Module({
   imports: [
     UsersModule,

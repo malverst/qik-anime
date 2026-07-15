@@ -37,6 +37,10 @@ class UpdateProfileDto {
   @IsOptional()
   @IsString()
   avatarFrame?: string;
+
+  @IsOptional()
+  @IsString()
+  avatarFrameColor?: string | null;
 }
 
 @Controller('users')

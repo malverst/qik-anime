@@ -16,6 +16,7 @@ export const FRAMES: FrameDef[] = [
   { id: 'gold', title: 'Золотая', color: 'linear-gradient(135deg,#ffd76a,#ffb347)', minLevel: 5 },
   { id: 'aurora', title: 'Аврора', color: 'linear-gradient(135deg,#b8a6f0,#a6e3d0,#f7c9d9)', minLevel: 8 },
   { id: 'legend', title: 'Легенда', color: 'linear-gradient(135deg,#ff5e8a,#7c5cff,#35c4a4)', minLevel: 12 },
+  { id: 'custom', title: 'Свой цвет', color: 'custom', minLevel: 50 },
 ];
 
 export function frameById(id: string): FrameDef | undefined {

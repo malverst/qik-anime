@@ -38,6 +38,10 @@ export class User {
   @Column({ nullable: true, type: 'text' })
   avatarFrame: string;
 
+  // custom color for the 'custom' frame (unlocked at level 50)
+  @Column({ nullable: true, type: 'text' })
+  avatarFrameColor: string;
+
   @Column({ nullable: true, type: 'text' })
   bio: string;
 

@@ -56,6 +56,7 @@ export default function Profile() {
   const [avatarUrl, setAvatarUrl] = useState(null)
   const [bannerUrl, setBannerUrl] = useState(null)
   const [frame, setFrame] = useState('none')
+  const [frameColorVal, setFrameColorVal] = useState('#b8a6f0')
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
   const [uploadingBanner, setUploadingBanner] = useState(false)
   const avatarFileRef = useRef(null)
@@ -73,6 +74,7 @@ export default function Profile() {
         setAvatarUrl(d.user.avatarUrl || null)
         setBannerUrl(d.user.bannerUrl || null)
         setFrame(d.user.avatarFrame || 'none')
+        setFrameColorVal(d.user.avatarFrameColor || '#b8a6f0')
       })
       .catch(() => setError(true))
       .finally(() => setLoading(false))
@@ -120,6 +122,7 @@ export default function Profile() {
         avatarUrl,
         bannerUrl,
         avatarFrame: frame,
+        avatarFrameColor: frame === 'custom' ? frameColorVal : null,
       })
       showToast('Профиль обновлён')
       setEditing(false)
@@ -182,7 +185,7 @@ export default function Profile() {
 
   // live preview object used while editing
   const previewUser = editing
-    ? { ...profile, avatarColor: color, avatarUrl, avatarFrame: frame }
+    ? { ...profile, avatarColor: color, avatarUrl, avatarFrame: frame, avatarFrameColor: frame === 'custom' ? frameColorVal : null }
     : profile
   const shownBanner = editing ? bannerUrl : profile.bannerUrl
   const profileImage = profile.avatarUrl || undefined
@@ -340,7 +343,7 @@ export default function Profile() {
                   >
                     <span
                       className="frame-ring"
-                      style={{ background: f.id === 'none' ? 'var(--surface-2)' : frameColor(f.id) }}
+                      style={{ background: f.id === 'none' ? 'var(--surface-2)' : f.id === 'custom' && frame === 'custom' ? frameColorVal : frameColor(f.id) }}
                     >
                       <span className="frame-dot" />
                     </span>
@@ -351,6 +354,20 @@ export default function Profile() {
                   </button>
                 ))}
               </div>
+              {frame === 'custom' && (
+                <div style={{ marginTop: 12 }}>
+                  <label style={{ display: 'block', marginBottom: 6 }}>Цвет рамки</label>
+                  <input
+                    type="color"
+                    value={frameColorVal}
+                    onChange={(e) => setFrameColorVal(e.target.value)}
+                    style={{
+                      width: 48, height: 40, borderRadius: 10, border: '2px solid var(--border)',
+                      background: 'none', cursor: 'pointer', padding: 2,
+                    }}
+                  />
+                </div>
+              )}
             </div>
 
             {bannerUrl && (

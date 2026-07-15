@@ -8,8 +8,10 @@ export const FRAMES = {
   gold: 'linear-gradient(135deg,#ffd76a,#ffb347)',
   aurora: 'linear-gradient(135deg,#b8a6f0,#a6e3d0,#f7c9d9)',
   legend: 'linear-gradient(135deg,#ff5e8a,#7c5cff,#35c4a4)',
+  custom: 'custom',
 }
 
-export function frameColor(id) {
+export function frameColor(id, customColor) {
+  if (id === 'custom' && customColor) return customColor
   return FRAMES[id] || 'transparent'
 }

@@ -76,6 +76,7 @@ export class UsersService {
       avatarUrl?: string | null;
       bannerUrl?: string | null;
       avatarFrame?: string;
+      avatarFrameColor?: string | null;
     },
   ) {
     const user = await this.findById(id);
@@ -99,6 +100,12 @@ export class UsersService {
       }
       user.avatarFrame = data.avatarFrame;
     }
+    if (data.avatarFrameColor !== undefined) {
+      if (user.avatarFrame !== 'custom' && data.avatarFrameColor) {
+        throw new BadRequestException('Цвет рамки можно задать только для рамки «Свой цвет»');
+      }
+      user.avatarFrameColor = data.avatarFrameColor || null;
+    }
 
     await this.repo.save(user);
     return this.toPublic(user);
@@ -115,6 +122,7 @@ export class UsersService {
       avatarUrl: user.avatarUrl || null,
       bannerUrl: user.bannerUrl || null,
       avatarFrame: user.avatarFrame || null,
+      avatarFrameColor: user.avatarFrameColor || null,
       bio: user.bio || '',
       isAdmin: !!user.isAdmin,
       isMaster: !!user.isMaster,

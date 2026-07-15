@@ -6,7 +6,7 @@ export default function Avatar({ user, size = 34 }) {
   if (!user) return null
   const letter = (user.username || '?').charAt(0).toUpperCase()
   const bg = user.avatarColor || '#b8a6f0'
-  const frame = user.avatarFrame && user.avatarFrame !== 'none' ? frameColor(user.avatarFrame) : null
+  const frame = user.avatarFrame && user.avatarFrame !== 'none' ? frameColor(user.avatarFrame, user.avatarFrameColor) : null
   const status = user.lastSeenAt ? lastSeen(user.lastSeenAt) : null
 
   const inner = (

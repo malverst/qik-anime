@@ -4471,6 +4471,15 @@ input {
   padding: 6px 14px;
   font-size: 13px;
   border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.fr-btn-label {
+  white-space: nowrap;
+}
+@media (max-width: 480px) {
+  .fr-btn-label { display: none; }
 }
 .friend-row .fr-actions .btn-icon {
   width: 42px;

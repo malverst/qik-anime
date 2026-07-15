@@ -22,6 +22,7 @@ import {
   EditIcon,
   CameraIcon,
   TrashIcon,
+  CloseIcon,
   SunIcon,
   MoonIcon,
   SaveIcon,
@@ -727,15 +728,20 @@ function UserFriends({ uid }) {
   const { user, showToast, openAuth } = useAuth()
   const [items, setItems] = useState(null)
   const [friends, setFriends] = useState(new Set())
+  const [outgoing, setOutgoing] = useState(new Set())
 
   useEffect(() => {
     backend.userFriends(uid).then((r) => setItems(Array.isArray(r) ? r : [])).catch(() => setItems([]))
   }, [uid])
 
   useEffect(() => {
-    if (!user) { setFriends(new Set()); return }
+    if (!user) { setFriends(new Set()); setOutgoing(new Set()); return }
     backend.listFriends().then((r) => {
-      setFriends(new Set((Array.isArray(r) ? r : []).map((f) => f.id)))
+      setFriends(new Set((Array.isArray(r) ? r : []).map(f => f.id)))
+    }).catch(() => {})
+    backend.pendingFriends().then((r) => {
+      const out = (r?.outgoing || []).map(f => f.user?.id).filter(Boolean)
+      setOutgoing(new Set(out))
     }).catch(() => {})
   }, [user])
 
@@ -743,7 +749,16 @@ function UserFriends({ uid }) {
     if (!user) return openAuth('login')
     try {
       await backend.requestFriend(targetId)
+      setOutgoing(s => { const n = new Set(s); n.add(targetId); return n })
       showToast('Заявка отправлена')
+    } catch (e) { showToast(e.message || 'Ошибка') }
+  }
+
+  async function cancelRequest(targetId) {
+    try {
+      await backend.removeFriend(targetId)
+      setOutgoing(s => { const n = new Set(s); n.delete(targetId); return n })
+      showToast('Заявка отозвана')
     } catch (e) { showToast(e.message || 'Ошибка') }
   }
 
@@ -765,6 +780,10 @@ function UserFriends({ uid }) {
                   try { await backend.removeFriend(f.id); showToast('Удалён из друзей'); setFriends((s) => { const n = new Set(s); n.delete(f.id); return n }) } catch (e) { showToast(e.message || 'Ошибка') }
                 }} title="Удалить из друзей">
                   <TrashIcon width={13} height={13} />
+                </button>
+              ) : outgoing.has(f.id) ? (
+                <button className="btn btn-ghost btn-sm" onClick={() => cancelRequest(f.id)} title="Отозвать заявку">
+                  <CloseIcon width={13} height={13} /> Отозвать
                 </button>
               ) : !friends.has(f.id) && (
                 <button className="btn btn-ghost btn-sm" onClick={() => addFriend(f.id)} title="Добавить в друзья">

@@ -176,14 +176,11 @@ export default function Friends() {
                   <span className="fr-name">{f.username}</span>
                 </Link>
                 <div className="fr-actions">
-                  <button className="btn btn-ghost btn-sm btn-icon" onClick={() => startChat(f.id)} title="Написать">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                  </button>
-                  <Link to={`/u/${f.id}`} className="btn btn-ghost btn-sm btn-icon" title="Профиль">
-                    <UserIcon width={20} height={20} />
+                  <Link to={`/u/${f.id}`} className="btn btn-ghost btn-sm" title="Профиль">
+                    <UserIcon width={16} height={16} /> <span className="fr-btn-label">Профиль</span>
                   </Link>
-                  <button className="btn btn-danger btn-sm btn-icon" onClick={() => removeFriend(f.id)} title="Удалить">
-                    <TrashIcon width={20} height={20} />
+                  <button className="btn btn-danger btn-sm" onClick={() => removeFriend(f.id)} title="Удалить">
+                    <TrashIcon width={16} height={16} /> <span className="fr-btn-label">Удалить</span>
                   </button>
                 </div>
               </div>

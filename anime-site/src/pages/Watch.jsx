@@ -36,15 +36,38 @@ export default function Watch() {
     return set
   }, [list])
 
+  const STORAGE_KEY = animeId ? `qik_watch_${animeId}` : null
+
+  // restore saved dub/player/ep from localStorage
+  function loadSaved() {
+    if (!STORAGE_KEY) return {}
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY)
+      return raw ? JSON.parse(raw) : {}
+    } catch { return {} }
+  }
+
   const [dub, setDub] = useState(null)
   const [player, setPlayer] = useState(null)
   const [epIndex, setEpIndex] = useState(null)
-  const [watched, setWatched] = useState({}) // episodeNumber -> row
+  const [watched, setWatched] = useState({})
   const [creatingRoom, setCreatingRoom] = useState(false)
   const savedRef = useRef({})
+  const restoredRef = useRef(false)
+
+  // save current selections to localStorage
+  function saveWatchState(d, p, ep) {
+    if (!STORAGE_KEY || !d || !p) return
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ dub: d, player: p, ep: ep?.video_id || null }))
+    } catch {}
+  }
 
   useEffect(() => {
-    if (dubbings.length && !dub) setDub(dubbings[0])
+    if (dubbings.length && !dub) {
+      const saved = loadSaved()
+      setDub(dubbings.includes(saved.dub) ? saved.dub : dubbings[0])
+    }
   }, [dubbings, dub])
 
   const players = useMemo(() => {
@@ -63,8 +86,15 @@ export default function Watch() {
   }, [list, dub])
 
   useEffect(() => {
-    if (players.length) setPlayer((prev) => (players.includes(prev) ? prev : players[0]))
-  }, [players])
+    if (players.length && dub) {
+      const saved = loadSaved()
+      setPlayer((prev) => {
+        const preferred = saved.player && saved.dub === dub ? saved.player : null
+        if (preferred && players.includes(preferred)) return preferred
+        return players.includes(prev) ? prev : players[0]
+      })
+    }
+  }, [players, dub])
 
   const episodes = useMemo(() => {
     return list
@@ -94,10 +124,15 @@ export default function Watch() {
 
   useEffect(() => {
     if (episodes.length) {
-      // Prefer the episode from "continue watching" query param
+      // Priority: 1) URL ep param  2) saved ep from localStorage  3) first episode
       const target = resumeEp && episodes.find((e) => String(e.number) === resumeEp)
       if (target) {
         setEpIndex(target.video_id)
+      } else if (!restoredRef.current) {
+        const saved = loadSaved()
+        const savedEp = saved.ep && episodes.find((e) => e.video_id === saved.ep)
+        setEpIndex(savedEp ? savedEp.video_id : episodes[0].video_id)
+        restoredRef.current = true
       } else {
         setEpIndex((prev) => (episodes.some((e) => e.video_id === prev) ? prev : episodes[0].video_id))
       }
@@ -107,6 +142,13 @@ export default function Watch() {
   }, [episodes, resumeEp])
 
   const current = episodes.find((e) => e.video_id === epIndex) || episodes[0]
+
+  // save dub/player/ep on change
+  useEffect(() => {
+    if (dub && player && current) {
+      saveWatchState(dub, player, current)
+    }
+  }, [dub, player, current?.video_id])
 
   // Visiting an episode marks it watched immediately (no time tracking).
   useEffect(() => {

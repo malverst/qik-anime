@@ -872,6 +872,8 @@ const PIE_COLORS = [
 
 function GenreChart({ uid, data: prefetched }) {
   const [fetched, setFetched] = useState(null)
+  const [tip, setTip] = useState(null)
+  const chartRef = useRef(null)
   const data = prefetched || fetched
 
   useEffect(() => {
@@ -881,13 +883,12 @@ function GenreChart({ uid, data: prefetched }) {
 
   if (!data || data.total === 0) return null
 
-  // top 8 genres, rest grouped into "Другое"
   const top = data.items.slice(0, 8)
   const restPct = data.items.slice(8).reduce((s, g) => s + g.percent, 0)
   const slices = [...top]
   if (restPct > 0) slices.push({ name: 'Другое', percent: Math.round(restPct * 10) / 10 })
 
-  // build conic-gradient
+  // conic-gradient stops
   let acc = 0
   const stops = slices.map((s, idx) => {
     const start = acc
@@ -895,17 +896,48 @@ function GenreChart({ uid, data: prefetched }) {
     const color = PIE_COLORS[idx % PIE_COLORS.length]
     return `${color} ${start}% ${acc}%`
   })
-  // pad to 100% if rounding leaves a gap
   if (acc < 100) stops.push(`var(--surface-2) ${acc}% 100%`)
 
+  // SVG overlay for hover detection
+  const size = 160, cx = 80, cy = 80, r = 78
+  function arcPath(startPct, endPct) {
+    const sa = (startPct / 100) * 2 * Math.PI - Math.PI / 2
+    const ea = (endPct / 100) * 2 * Math.PI - Math.PI / 2
+    const x1 = cx + r * Math.cos(sa), y1 = cy + r * Math.sin(sa)
+    const x2 = cx + r * Math.cos(ea), y2 = cy + r * Math.sin(ea)
+    const la = endPct - startPct > 50 ? 1 : 0
+    return `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${la} 1 ${x2} ${y2} Z`
+  }
+  let a = 0
+
   return (
-    <div className="genre-chart-card">
+    <div className="genre-chart-card" ref={chartRef}>
       <h3 className="genre-chart-title">Любимые жанры</h3>
       <div className="genre-chart">
-        <div
-          className="pie"
-          style={{ background: `conic-gradient(${stops.join(', ')})` }}
-        >
+        <div className="pie" style={{ background: `conic-gradient(${stops.join(', ')})` }}>
+          <svg className="pie-overlay" viewBox={`0 0 ${size} ${size}`}>
+            {slices.map((s, idx) => {
+              const start = a
+              a += s.percent
+              const d = arcPath(start, a)
+              return (
+                <path
+                  key={idx}
+                  d={d}
+                  fill="transparent"
+                  onMouseEnter={(e) => {
+                    const rect = chartRef.current?.getBoundingClientRect()
+                    setTip({ name: s.name, pct: s.percent, x: e.clientX - (rect?.left || 0) + 12, y: e.clientY - (rect?.top || 0) - 8 })
+                  }}
+                  onMouseMove={(e) => {
+                    const rect = chartRef.current?.getBoundingClientRect()
+                    setTip(prev => prev ? { ...prev, x: e.clientX - (rect?.left || 0) + 12, y: e.clientY - (rect?.top || 0) - 8 } : prev)
+                  }}
+                  onMouseLeave={() => setTip(null)}
+                />
+              )
+            })}
+          </svg>
           <div className="pie-hole">
             <b>{data.items[0]?.name || '—'}</b>
             <span>{data.items[0]?.percent || 0}%</span>
@@ -914,16 +946,18 @@ function GenreChart({ uid, data: prefetched }) {
         <div className="genre-legend">
           {slices.map((s, idx) => (
             <div className="legend-row" key={s.name}>
-              <span
-                className="legend-dot"
-                style={{ background: PIE_COLORS[idx % PIE_COLORS.length] }}
-              />
+              <span className="legend-dot" style={{ background: PIE_COLORS[idx % PIE_COLORS.length] }} />
               <span className="legend-name">{s.name}</span>
               <span className="legend-pct">{s.percent}%</span>
             </div>
           ))}
         </div>
       </div>
+      {tip && (
+        <div className="genre-tip" style={{ left: tip.x, top: tip.y }}>
+          {tip.name} — {tip.pct}%
+        </div>
+      )}
     </div>
   )
 }

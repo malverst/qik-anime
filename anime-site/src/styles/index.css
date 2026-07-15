@@ -3605,6 +3605,7 @@ input {
 
 /* genre pie chart */
 .genre-chart-card {
+  position: relative;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 14px;
@@ -3618,6 +3619,34 @@ input {
   justify-content: center;
   gap: 30px;
   flex-wrap: wrap;
+}
+.pie-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+.pie-overlay path {
+  cursor: pointer;
+}
+.pie-overlay path:hover {
+  fill: rgba(255, 255, 255, 0.08);
+}
+
+.genre-tip {
+  position: absolute;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  padding: 6px 12px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  pointer-events: none;
+  z-index: 10;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 .pie {
   width: 170px;

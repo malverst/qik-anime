@@ -20,6 +20,7 @@ import { ChatMessage } from './chats/chat-message.entity';
 import { PushSubscriptionEntity } from './push/push-subscription.entity';
 import { SearchHistory } from './search-history/search-history.entity';
 import { AuditLog } from './admin/audit-log.entity';
+import { ApiToken } from './auth/api-token.entity';
 import { Issue } from './issues/issue.entity';
 import { IssueAttachment } from './issues/issue-attachment.entity';
 
@@ -76,6 +77,7 @@ import { DB_PATH, UPLOAD_DIR_ABSOLUTE } from './common/runtime-paths';
         AuditLog,
         Issue,
         IssueAttachment,
+        ApiToken,
       ],
       synchronize: true, // dev convenience; auto-creates tables
     }),

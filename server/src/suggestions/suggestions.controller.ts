@@ -6,7 +6,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { IsInt, IsOptional, IsString } from 'class-validator';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CompositeAuthGuard } from '../auth/composite-auth.guard';
 import { CurrentUser, AuthUser } from '../common/current-user.decorator';
 import { NotificationsService } from '../notifications/notifications.service';
 import { FriendsService } from '../friends/friends.service';
@@ -37,7 +37,7 @@ class SuggestDto {
 }
 
 @Controller('suggestions')
-@UseGuards(JwtAuthGuard)
+@UseGuards(CompositeAuthGuard)
 export class SuggestionsController {
   constructor(
     private readonly notifications: NotificationsService,

@@ -7,14 +7,14 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CompositeAuthGuard } from '../auth/composite-auth.guard';
 import { AuthUser, CurrentUser } from '../common/current-user.decorator';
 import { ChatsService } from './chats.service';
 import { ChatsGateway } from './chats.gateway';
 import { SendMessageDto, StartChatDto } from './dto';
 
 @Controller('chats')
-@UseGuards(JwtAuthGuard)
+@UseGuards(CompositeAuthGuard)
 export class ChatsController {
   constructor(
     private readonly service: ChatsService,

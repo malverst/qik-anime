@@ -10,7 +10,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CompositeAuthGuard } from '../auth/composite-auth.guard';
 import { MasterOrAdminGuard } from '../auth/master-admin.guard';
 import { AuthUser, CurrentUser } from '../common/current-user.decorator';
 import {

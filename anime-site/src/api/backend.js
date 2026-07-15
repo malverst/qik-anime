@@ -247,6 +247,9 @@ export const backend = {
   adminServer: () => request('/admin/server', { auth: true }),
   adminAudit: (page = 1) => request(`/admin/audit?page=${page}&limit=50`, { auth: true }),
   adminRegistrations: (days = 30) => request(`/admin/registrations?days=${days}`, { auth: true }),
+  adminTokens: () => request('/admin/tokens', { auth: true }),
+  adminCreateToken: (name) => request('/admin/tokens', { method: 'POST', body: { name }, auth: true }),
+  adminDeleteToken: (id) => request(`/admin/tokens/${id}`, { method: 'DELETE', auth: true }),
 
   // ---- quiz ----
   quizQuestion: (exclude) => {

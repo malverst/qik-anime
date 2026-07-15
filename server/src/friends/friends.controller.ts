@@ -8,11 +8,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { FriendsService } from './friends.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CompositeAuthGuard } from '../auth/composite-auth.guard';
 import { CurrentUser, AuthUser } from '../common/current-user.decorator';
 
 @Controller('friends')
-@UseGuards(JwtAuthGuard)
+@UseGuards(CompositeAuthGuard)
 export class FriendsController {
   constructor(private readonly service: FriendsService) {}
 

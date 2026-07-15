@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Delete, Param, Body, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CompositeAuthGuard } from '../auth/composite-auth.guard';
 import { CurrentUser } from '../common/current-user.decorator';
 import { User } from '../users/user.entity';
 import { SearchHistoryService } from './search-history.service';
 
 @Controller('search-history')
-@UseGuards(JwtAuthGuard)
+@UseGuards(CompositeAuthGuard)
 export class SearchHistoryController {
   constructor(private readonly svc: SearchHistoryService) {}
 

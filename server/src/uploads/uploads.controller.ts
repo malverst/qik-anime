@@ -10,14 +10,14 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { randomBytes } from 'crypto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CompositeAuthGuard } from '../auth/composite-auth.guard';
 import { UPLOAD_DIR_ABSOLUTE } from '../common/runtime-paths';
 
 const ALLOWED = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
 
 @Controller('uploads')
 export class UploadsController {
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(CompositeAuthGuard)
   @Post('image')
   @UseInterceptors(
     FileInterceptor('file', {

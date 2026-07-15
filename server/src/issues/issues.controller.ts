@@ -17,13 +17,13 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { IssuesService } from './issues.service';
 import { CreateIssueDto, UpdateIssueDto } from './dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CompositeAuthGuard } from '../auth/composite-auth.guard';
 import { MasterOrAdminGuard } from '../auth/master-admin.guard';
 import { CurrentUser, AuthUser } from '../common/current-user.decorator';
 import { UPLOAD_DIR_ABSOLUTE } from '../common/runtime-paths';
 
 @Controller('issues')
-@UseGuards(JwtAuthGuard, MasterOrAdminGuard)
+@UseGuards(CompositeAuthGuard, MasterOrAdminGuard)
 export class IssuesController {
   constructor(private readonly service: IssuesService) {}
 

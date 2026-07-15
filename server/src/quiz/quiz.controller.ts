@@ -1,5 +1,5 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CompositeAuthGuard } from '../auth/composite-auth.guard';
 
 // Read .env directly as fallback (PM2 may not pass env vars)
 import { readFileSync } from 'fs';
@@ -106,7 +106,7 @@ async function generateEmoji(title: string) {
 }
 
 @Controller('quiz')
-@UseGuards(JwtAuthGuard)
+@UseGuards(CompositeAuthGuard)
 export class QuizController {
   @Get('question')
   async question(@Query('exclude') exclude?: string) {

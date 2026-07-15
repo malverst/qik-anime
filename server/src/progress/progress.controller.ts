@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { ProgressService } from './progress.service';
 import { SaveProgressDto } from './dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CompositeAuthGuard } from '../auth/composite-auth.guard';
 import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
 import { CurrentUser, AuthUser } from '../common/current-user.decorator';
 
@@ -19,13 +19,13 @@ import { CurrentUser, AuthUser } from '../common/current-user.decorator';
 export class ProgressController {
   constructor(private readonly service: ProgressService) {}
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(CompositeAuthGuard)
   @Put()
   save(@CurrentUser() user: AuthUser, @Body() dto: SaveProgressDto) {
     return this.service.save(user.id, dto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(CompositeAuthGuard)
   @Get('anime/:animeId')
   forAnime(
     @CurrentUser() user: AuthUser,
@@ -34,7 +34,7 @@ export class ProgressController {
     return this.service.forAnime(user.id, animeId);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(CompositeAuthGuard)
   @Delete('anime/:animeId/:episodeNumber')
   removeEpisode(
     @CurrentUser() user: AuthUser,
@@ -44,7 +44,7 @@ export class ProgressController {
     return this.service.removeEpisode(user.id, animeId, episodeNumber);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(CompositeAuthGuard)
   @Get('continue')
   continue(@CurrentUser() user: AuthUser, @Query('limit') limit?: string) {
     return this.service.continueWatching(user.id, limit ? +limit : 12);

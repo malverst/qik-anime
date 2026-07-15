@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Post, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CompositeAuthGuard } from '../auth/composite-auth.guard';
 import { CurrentUser, AuthUser } from '../common/current-user.decorator';
 import { PushService, getVapidPublicKey } from './push.service';
 
@@ -13,7 +13,7 @@ export class PushController {
   }
 
   @Post('subscribe')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(CompositeAuthGuard)
   subscribe(
     @CurrentUser() user: AuthUser,
     @Body() body: { endpoint: string; keys: { p256dh: string; auth: string } },
@@ -22,7 +22,7 @@ export class PushController {
   }
 
   @Delete('subscribe')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(CompositeAuthGuard)
   unsubscribe(
     @CurrentUser() user: AuthUser,
     @Body() body: { endpoint: string },

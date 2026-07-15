@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto, UpdateCommentDto } from './dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CompositeAuthGuard } from '../auth/composite-auth.guard';
 import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
 import { CurrentUser, AuthUser } from '../common/current-user.decorator';
 
@@ -55,19 +55,19 @@ export class CommentsController {
     return this.service.listByUser(userId, user?.id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(CompositeAuthGuard)
   @Post()
   create(@CurrentUser() user: AuthUser, @Body() dto: CreateCommentDto) {
     return this.service.create(user.id, dto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(CompositeAuthGuard)
   @Post(':id/like')
   like(@CurrentUser() user: AuthUser, @Param('id', ParseIntPipe) id: number) {
     return this.service.toggleLike(user.id, id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(CompositeAuthGuard)
   @Patch(':id')
   update(
     @CurrentUser() user: AuthUser,
@@ -77,7 +77,7 @@ export class CommentsController {
     return this.service.update(user.id, id, dto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(CompositeAuthGuard)
   @Delete(':id')
   remove(@CurrentUser() user: AuthUser, @Param('id', ParseIntPipe) id: number) {
     return this.service.remove(user.id, id);

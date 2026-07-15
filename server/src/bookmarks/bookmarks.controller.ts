@@ -12,11 +12,11 @@ import {
 } from '@nestjs/common';
 import { BookmarksService } from './bookmarks.service';
 import { ImportAnixartDto, UpsertBookmarkDto } from './dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CompositeAuthGuard } from '../auth/composite-auth.guard';
 import { CurrentUser, AuthUser } from '../common/current-user.decorator';
 
 @Controller('bookmarks')
-@UseGuards(JwtAuthGuard)
+@UseGuards(CompositeAuthGuard)
 export class BookmarksController {
   constructor(private readonly service: BookmarksService) {}
 

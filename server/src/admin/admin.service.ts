@@ -3,9 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { User } from '../users/user.entity';
 import { AuditLog } from './audit-log.entity';
+import { ApiToken } from '../auth/api-token.entity';
 import * as os from 'os';
 import { execSync } from 'child_process';
 import { statSync } from 'fs';
+import { randomBytes } from 'crypto';
 import { DB_PATH, UPLOAD_DIR_ABSOLUTE } from '../common/runtime-paths';
 
 @Injectable()
@@ -15,6 +17,8 @@ export class AdminService {
     private readonly users: Repository<User>,
     @InjectRepository(AuditLog)
     private readonly audit: Repository<AuditLog>,
+    @InjectRepository(ApiToken)
+    private readonly tokens: Repository<ApiToken>,
   ) {}
 
   private log(action: string, adminId: number, adminName: string, target?: string, details?: string) {
@@ -228,6 +232,24 @@ export class AdminService {
       page,
       pages: Math.ceil(total / limit),
     };
+  }
+
+  // ---- API tokens ----
+
+  async listTokens() {
+    return this.tokens.find({ order: { id: 'DESC' }, select: ['id', 'name', 'active', 'createdAt', 'expiresAt'] });
+  }
+
+  async createToken(name: string) {
+    const token = `qik_${randomBytes(24).toString('hex')}`;
+    const record = this.tokens.create({ name, token });
+    await this.tokens.save(record);
+    return { id: record.id, name, token, active: true, createdAt: record.createdAt };
+  }
+
+  async deleteToken(id: number) {
+    await this.tokens.delete(id);
+    return { ok: true };
   }
 }
 

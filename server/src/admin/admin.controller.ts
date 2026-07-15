@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { AdminGuard } from '../auth/admin.guard';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CompositeAuthGuard } from '../auth/composite-auth.guard';
 import { CurrentUser } from '../common/current-user.decorator';
 
 @Controller('admin')
@@ -9,7 +9,7 @@ export class AdminController {
   constructor(private readonly service: AdminService) {}
 
   @Post('claim')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(CompositeAuthGuard)
   claim(@CurrentUser('id') userId: number, @Body() body: { secret?: string }) {
     return this.service.claimAdmin(userId, body.secret || '');
   }
@@ -71,5 +71,24 @@ export class AdminController {
   @UseGuards(AdminGuard)
   registrations(@Query('days') days?: string) {
     return this.service.getRegistrationStats(days ? +days : 30);
+  }
+
+  // ---- API tokens ----
+  @Get('tokens')
+  @UseGuards(AdminGuard)
+  listTokens() {
+    return this.service.listTokens();
+  }
+
+  @Post('tokens')
+  @UseGuards(AdminGuard)
+  createToken(@Body() body: { name: string }) {
+    return this.service.createToken(body.name);
+  }
+
+  @Delete('tokens/:id')
+  @UseGuards(AdminGuard)
+  deleteToken(@Param('id', ParseIntPipe) id: number) {
+    return this.service.deleteToken(id);
   }
 }

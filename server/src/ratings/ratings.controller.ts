@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { RatingsService } from './ratings.service';
 import { RateDto, RateOpeningDto } from './dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CompositeAuthGuard } from '../auth/composite-auth.guard';
 import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
 import { CurrentUser, AuthUser } from '../common/current-user.decorator';
 
@@ -29,13 +29,13 @@ export class RatingsController {
     return this.service.summary(animeId, user?.id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(CompositeAuthGuard)
   @Put()
   rate(@CurrentUser() user: AuthUser, @Body() dto: RateDto) {
     return this.service.rate(user.id, dto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(CompositeAuthGuard)
   @Delete('anime/:animeId')
   remove(
     @CurrentUser() user: AuthUser,
@@ -46,7 +46,7 @@ export class RatingsController {
 
   // ---- OP/ED ratings ----
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(CompositeAuthGuard)
   @Put('opening')
   rateOpening(@CurrentUser() user: AuthUser, @Body() dto: RateOpeningDto) {
     return this.service.rateOpening(user.id, dto);
@@ -61,7 +61,7 @@ export class RatingsController {
     return this.service.getOpeningRatings(animeId, user?.id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(CompositeAuthGuard)
   @Delete('opening/:animeId/:type')
   removeOpeningRating(
     @CurrentUser() user: AuthUser,

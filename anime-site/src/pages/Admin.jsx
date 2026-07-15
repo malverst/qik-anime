@@ -127,6 +127,9 @@ export default function Admin() {
         <button className={`subtab ${tab === 'chart' ? 'active' : ''}`} onClick={() => setTab('chart')}>
           График
         </button>
+        <button className={`subtab ${tab === 'tokens' ? 'active' : ''}`} onClick={() => setTab('tokens')}>
+          API токены
+        </button>
       </div>
 
       {tab === 'stats' && <StatsView stats={stats} />}
@@ -144,6 +147,7 @@ export default function Admin() {
       {tab === 'server' && <ServerView />}
       {tab === 'audit' && <AuditView />}
       {tab === 'chart' && <ChartView />}
+      {tab === 'tokens' && <TokensView />}
     </div>
   )
 }
@@ -448,6 +452,93 @@ function ChartView() {
         })}
       </div>
     </div>
+  )
+}
+
+function TokensView() {
+  const [tokens, setTokens] = useState(null)
+  const [name, setName] = useState('')
+  const [newToken, setNewToken] = useState(null)
+
+  useEffect(() => {
+    backend.adminTokens().then(setTokens).catch(() => setTokens([]))
+  }, [])
+
+  async function create() {
+    if (!name.trim()) return
+    try {
+      const t = await backend.adminCreateToken(name.trim())
+      setNewToken(t)
+      setName('')
+      setTokens((prev) => [t, ...(prev || [])])
+    } catch (e) { alert(e.message || 'Ошибка') }
+  }
+
+  async function remove(id) {
+    if (!confirm('Отозвать токен?')) return
+    try {
+      await backend.adminDeleteToken(id)
+      setTokens((prev) => (prev || []).filter((t) => t.id !== id))
+    } catch (e) { alert(e.message || 'Ошибка') }
+  }
+
+  if (!tokens) return <div className="comment-empty">Загрузка...</div>
+
+  return (
+    <>
+      <div style={{ marginBottom: 20, display: 'flex', gap: 10, alignItems: 'flex-end', maxWidth: 420 }}>
+        <input
+          className="select"
+          style={{ flex: 1 }}
+          placeholder="Название токена..."
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && create()}
+        />
+        <button className="btn btn-primary" onClick={create} disabled={!name.trim()}>
+          Создать
+        </button>
+      </div>
+
+      {newToken && (
+        <div style={{ marginBottom: 20, padding: 16, background: 'var(--surface-2)', borderRadius: 12, border: '1px solid var(--accent)' }}>
+          <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 6, color: 'var(--accent)' }}>Токен создан. Скопируйте его — он больше не будет показан:</div>
+          <code style={{ fontSize: 13, wordBreak: 'break-all', background: 'var(--surface)', padding: '8px 12px', borderRadius: 8, display: 'block', fontFamily: 'monospace' }}>{newToken.token}</code>
+          <button className="btn btn-ghost btn-sm" style={{ marginTop: 10 }} onClick={() => setNewToken(null)}>Понятно</button>
+        </div>
+      )}
+
+      {tokens.length === 0 ? (
+        <div className="comment-empty">Нет токенов.</div>
+      ) : (
+        <div style={{ overflowX: 'auto' }}>
+          <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+            <thead>
+              <tr>
+                <th style={th}>ID</th>
+                <th style={th}>Название</th>
+                <th style={th}>Токен</th>
+                <th style={th}>Создан</th>
+                <th style={th}></th>
+              </tr>
+            </thead>
+            <tbody>
+              {tokens.map((t) => (
+                <tr key={t.id}>
+                  <td style={td}>{t.id}</td>
+                  <td style={td}><b>{t.name}</b></td>
+                  <td style={{ ...td, fontFamily: 'monospace', fontSize: 12 }}><code>{t.token.slice(0, 12)}…</code></td>
+                  <td style={{ ...td, fontSize: 13, color: 'var(--text-dim)' }}>{new Date(t.createdAt).toLocaleDateString('ru-RU')}</td>
+                  <td style={td}>
+                    <button className="btn btn-ghost btn-sm" onClick={() => remove(t.id)} style={{ color: '#ff6b6b', fontSize: 12 }}>Отозвать</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </>
   )
 }
 

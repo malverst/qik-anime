@@ -8,11 +8,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CompositeAuthGuard } from '../auth/composite-auth.guard';
 import { CurrentUser, AuthUser } from '../common/current-user.decorator';
 
 @Controller('notifications')
-@UseGuards(JwtAuthGuard)
+@UseGuards(CompositeAuthGuard)
 export class NotificationsController {
   constructor(private readonly service: NotificationsService) {}
 

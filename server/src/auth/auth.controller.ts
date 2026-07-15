@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto } from './dto';
-import { JwtAuthGuard } from './jwt-auth.guard';
+import { CompositeAuthGuard } from './composite-auth.guard';
 import { CurrentUser, AuthUser } from '../common/current-user.decorator';
 
 @Controller('auth')
@@ -18,7 +18,7 @@ export class AuthController {
     return this.auth.login(dto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(CompositeAuthGuard)
   @Get('me')
   me(@CurrentUser() user: AuthUser) {
     return this.auth.me(user.id);

@@ -12,7 +12,7 @@ import { IsHexColor, IsOptional, IsString, MaxLength } from 'class-validator';
 import { UsersService } from './users.service';
 import { FriendsService } from '../friends/friends.service';
 import { BookmarksService } from '../bookmarks/bookmarks.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CompositeAuthGuard } from '../auth/composite-auth.guard';
 import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
 import { CurrentUser, AuthUser } from '../common/current-user.decorator';
 
@@ -55,7 +55,7 @@ export class UsersController {
   }
 
   // update own profile
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(CompositeAuthGuard)
   @Patch('me')
   updateMe(@CurrentUser() user: AuthUser, @Body() dto: UpdateProfileDto) {
     return this.users.updateProfile(user.id, dto);

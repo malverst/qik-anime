@@ -24,6 +24,6 @@ import { CompositeAuthGuard } from './composite-auth.guard';
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, ApiTokenGuard, JwtAuthGuard, CompositeAuthGuard],
-  exports: [JwtStrategy, PassportModule, ApiTokenGuard, CompositeAuthGuard],
+  exports: [JwtAuthGuard, JwtStrategy, PassportModule, ApiTokenGuard, CompositeAuthGuard],
 })
 export class AuthModule {}

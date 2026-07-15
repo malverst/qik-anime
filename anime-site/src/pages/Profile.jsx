@@ -211,7 +211,7 @@ export default function Profile() {
             style={{ backgroundImage: `url(${uploadUrl(shownBanner)})` }}
           />
         )}
-        <QikiMascot />
+        <QikiMascot editing={editing} />
         {isSelf && editing && (
           <button
             className="banner-edit-btn"
@@ -499,13 +499,13 @@ export default function Profile() {
   )
 }
 
-function QikiMascot() {
+function QikiMascot({ editing }) {
   const [open, setOpen] = useState(false)
   const [hovered, setHovered] = useState(false)
   return (
     <>
       <button
-        className="qiki-mascot"
+        className={`qiki-mascot${editing ? ' qiki-mascot--editing' : ''}`}
         onClick={() => setOpen(!open)}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}

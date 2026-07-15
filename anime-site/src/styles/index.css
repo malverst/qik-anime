@@ -1139,6 +1139,11 @@ input {
   cursor: pointer;
   padding: 0;
   z-index: 5;
+  transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.qiki-mascot--editing {
+  right: 50%;
+  transform: translateX(50%);
 }
 .qiki-mascot .qiki-img {
   position: absolute;

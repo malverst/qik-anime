@@ -67,6 +67,8 @@ export default function Issues() {
   const { user, ready, openAuth } = useAuth()
   const [issues, setIssues] = useState(null)
   const [title, setTitle] = useState('')
+  const [page, setPage] = useState('')
+  const [block, setBlock] = useState('')
   const [sending, setSending] = useState(false)
   const [filter, setFilter] = useState('')
   const [uploadingId, setUploadingId] = useState(null)
@@ -111,8 +113,10 @@ export default function Issues() {
     if (!t || sending) return
     setSending(true)
     try {
-      await backend.createIssue(t)
+      await backend.createIssue(t, page.trim() || undefined, block.trim() || undefined)
       setTitle('')
+      setPage('')
+      setBlock('')
       load()
     } catch { /* */ }
     setSending(false)
@@ -164,10 +168,9 @@ export default function Issues() {
       <h1 style={{ marginBottom: 24 }}>🐛 Баг-репорты</h1>
 
       {/* form */}
-      <form className="issues-form" onSubmit={submit} style={{
-        display: 'flex', gap: 10, marginBottom: 24,
-        background: 'var(--surface)', border: '1px solid var(--border)',
-        borderRadius: 14, padding: 6,
+      <form onSubmit={submit} style={{
+        marginBottom: 24, background: 'var(--surface)', border: '1px solid var(--border)',
+        borderRadius: 14, padding: 14, display: 'flex', flexDirection: 'column', gap: 10,
       }}>
         <input
           value={title}
@@ -175,19 +178,43 @@ export default function Issues() {
           placeholder="Опишите баг или что нужно исправить…"
           maxLength={500}
           style={{
-            flex: 1, background: 'transparent', border: 'none',
-            padding: '10px 12px', color: 'var(--text)', fontSize: 14,
+            background: 'transparent', border: 'none',
+            padding: '6px 0', color: 'var(--text)', fontSize: 14,
             outline: 'none',
           }}
         />
-        <button
-          type="submit"
-          className="btn btn-primary"
-          disabled={sending || !title.trim()}
-          style={{ padding: '10px 20px', borderRadius: 11 }}
-        >
-          {sending ? '…' : 'Отправить'}
-        </button>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <input
+            value={page}
+            onChange={e => setPage(e.target.value)}
+            placeholder="Страница (например: /profile)"
+            maxLength={200}
+            style={{
+              flex: 1, background: 'var(--surface-2)', border: '1px solid var(--border)',
+              borderRadius: 10, padding: '8px 12px', color: 'var(--text)', fontSize: 13,
+              outline: 'none',
+            }}
+          />
+          <input
+            value={block}
+            onChange={e => setBlock(e.target.value)}
+            placeholder="Блок (например: кнопка Сохранить)"
+            maxLength={200}
+            style={{
+              flex: 1, background: 'var(--surface-2)', border: '1px solid var(--border)',
+              borderRadius: 10, padding: '8px 12px', color: 'var(--text)', fontSize: 13,
+              outline: 'none',
+            }}
+          />
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={sending || !title.trim()}
+            style={{ padding: '8px 18px', borderRadius: 11, flexShrink: 0 }}
+          >
+            {sending ? '…' : 'Отправить'}
+          </button>
+        </div>
       </form>
 
       {/* filters */}
@@ -233,6 +260,12 @@ export default function Issues() {
                     {issue.reporter?.username || '?'} · {new Date(issue.createdAt).toLocaleString('ru-RU')}
                     {issue.assignee && <> · 👤 {issue.assignee.username}</>}
                   </div>
+                  {(issue.page || issue.block) && (
+                    <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 4, display: 'flex', gap: 12 }}>
+                      {issue.page && <span>📄 {issue.page}</span>}
+                      {issue.block && <span>📍 {issue.block}</span>}
+                    </div>
+                  )}
                 </div>
 
                 <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>

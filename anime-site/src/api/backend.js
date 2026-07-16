@@ -279,7 +279,7 @@ export const backend = {
 
   // ---- issues (masters only) ----
   listIssues: (status) => request(`/issues${status ? '?status=' + status : ''}`, { auth: true }),
-  createIssue: (title) => request('/issues', { method: 'POST', body: { title }, auth: true }),
+  createIssue: (title, page, block) => request('/issues', { method: 'POST', body: { title, page, block }, auth: true }),
   updateIssue: (id, status) => request(`/issues/${id}`, { method: 'PATCH', body: { status }, auth: true }),
   assignIssue: (id) => request(`/issues/${id}/assign`, { method: 'POST', auth: true }),
   deleteIssue: (id) => request(`/issues/${id}`, { method: 'DELETE', auth: true }),

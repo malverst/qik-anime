@@ -20,6 +20,12 @@ export class Issue {
   @Column({ type: 'text' })
   title: string;
 
+  @Column({ type: 'text', nullable: true })
+  page: string;
+
+  @Column({ type: 'text', nullable: true })
+  block: string;
+
   @Column({ default: 'open', type: 'text' })
   status: IssueStatus;
 

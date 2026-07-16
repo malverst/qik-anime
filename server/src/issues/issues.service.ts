@@ -27,6 +27,8 @@ export class IssuesService {
   async create(userId: number, dto: CreateIssueDto) {
     const issue = this.repo.create({
       title: dto.title,
+      page: dto.page || null,
+      block: dto.block || null,
       status: 'open',
       reporter: { id: userId } as any,
     });

@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-QIK Anime — full-stack приложение для просмотра и отслеживания аниме. Состоит из React SPA (`anime-site/`) и NestJS бэкенда (`server/`). Данные об аниме берутся из внешнего YummyAnime API (https://yani.tv). Бэкенд добавляет социальные и геймификационные фичи: пользователи, закладки, рейтинги, комментарии, прогресс просмотра, друзья, уведомления, совместные комнаты просмотра.
+QIK Anime — full-stack приложение для просмотра и отслеживания аниме. Состоит из React SPA (`anime-site/`) и NestJS бэкенда (`server/`). Данные об аниме берутся из внешнего YummyAnime API (https://yani.tv). Бэкенд добавляет социальные и геймификационные фичи: пользователи, закладки, рейтинги (аниме и OP/ED), комментарии, прогресс просмотра, друзья, личные чаты, уведомления (вкл. web-push), совместные комнаты просмотра, эмодзи-квиз, баг-репорты, история поиска, админка с аудит-логом.
 
 ## Tech Stack
 
@@ -18,7 +18,7 @@ cd anime-site && npm run dev     # Dev сервер на :5173
 cd anime-site && npm run build   # Production build
 
 # Backend (из корня)
-cd server && npm run start:dev   # Dev сервер на :3001
+cd server && npm run dev         # Dev сервер на :3001 (nest start --watch)
 cd server && npm run build       # Компиляция TypeScript
 ```
 
@@ -51,6 +51,8 @@ UPLOAD_DIR=uploads
 CORS_ORIGINS=
 ADMIN_SECRET=<код для получения админки>
 DEEPSEEK_TOKEN=<токен для квиза>
+VAPID_PUBLIC_KEY=<ключ web-push>
+VAPID_PRIVATE_KEY=<ключ web-push>
 ```
 
 ### Что может сломаться и как чинить
@@ -130,9 +132,10 @@ cd ../server && npm ci --omit=dev && npm run build && pm2 reload anime-api
 - Модульная структура: каждый модуль в своей папке внутри `server/src/`
 - JWT аутентификация через Passport (токен в `Authorization: Bearer <token>`)
 - Декоратор `@CurrentUser()` для получения пользователя в контроллерах
+- `CompositeAuthGuard` — основной guard на защищённых роутах: пропускает по JWT ИЛИ по server-to-server API-токену (таблица `api_tokens`, `ApiTokenGuard`)
 - `OptionalJwtAuthGuard` для эндпоинтов, доступных и гостям
 - `AdminGuard` — только админы
-- `MasterOrAdminGuard` — мастера и админы (комнаты)
+- `MasterOrAdminGuard` — мастера и админы (комнаты, баг-трекер `/issues`)
 - DTO с валидацией через `class-validator`
 - Загрузка файлов через multer в `uploads/`
 - AniLibria API проксируется через `anilibria.service.ts`

@@ -1,120 +1,30 @@
 # STATE.md
 
-## Client-Side State
+Текущее состояние проекта — кратко. Обновляется при значимых изменениях (новые фичи, новые ограничения). История правок — в git и `context_log/`, сюда её не писать.
 
-### AuthContext (`anime-site/src/context/AuthContext.jsx`)
+**Обновлено**: 2026-07-19
 
-Центральное хранилище состояния пользователя.
+## Статус
 
-```js
-{
-  user: null | { id, email, username, avatarColor, avatarUrl, bannerUrl, avatarFrame, bio },
-  token: null | string,
-  isAuthModalOpen: boolean,
-  toasts: Array<{ id, type: 'success' | 'error', message }>,
-}
-```
+Прод живой: https://quickik.ru (автодеплой из `main`: GitHub Actions → VPS → PM2 `anime-api` + nginx). Активная разработка.
 
-- `user` и `token` синхронизируются с `localStorage` (ключи `qik_token`, `qik_user`)
-- При монтировании: если токен есть, проверяется через `GET /auth/me`
-- `login()`, `register()` — устанавливают токен и пользователя
-- `logout()` — очищает токен и пользователя
-- `addToast()` — добавляет уведомление (автоудаление через 4с)
-- `removeToast()` — удаляет уведомление по id
+## Что реализовано
 
-### ThemeContext (`anime-site/src/context/ThemeContext.jsx`)
+- **Каталог и просмотр**: YummyAnime API; плееры Kodik (iframe) и AniLibria (HLS.js), сохранение выбранного плеера/озвучки/серии; расписание; поиск с историей
+- **Аккаунты**: JWT (30 дней), роли user/master/admin; профиль с баннером, аватаром, био, маскотом Qiki, пай-чартом жанров; рамки аватара по уровням, кастомный цвет рамки с 50 уровня
+- **Соцфичи**: закладки (7 статусов), рейтинги аниме и OP/ED + лидерборды `/ratings`, комментарии с лайками и модерацией мастерами, друзья, личные чаты, предложения аниме
+- **Комнаты совместного просмотра** (только мастера/админы): Socket.IO синхронизация + HTTP fallback, чат комнаты
+- **Геймификация**: XP из активности (не хранится в БД), уровни, 10 достижений, рамки
+- **Квиз**: по кадрам и по эмодзи (DeepSeek API)
+- **Уведомления**: in-app (7 типов) + web-push (VAPID), настройка подписки в Settings
+- **Админка**: статистика, назначение мастеров, аудит-лог; баг-трекер `/issues` для мастеров (поля страница/блок, статусы, исполнитель, вложения)
+- **Auth для интеграций**: server-to-server API-токены (`api_tokens`, `CompositeAuthGuard`)
+- **UI**: тёмная/светлая тема, liquid glass навбар (GlassSurface), мобильная адаптивность, SEO (react-helmet-async, sitemap)
 
-```js
-{
-  theme: 'dark' | 'light',
-  toggleTheme: () => void,
-}
-```
+## Ограничения / особенности
 
-- Значение хранится в `localStorage` (ключ `theme`)
-- При изменении устанавливает `data-theme` атрибут на `<html>`
-- По умолчанию `dark`
-
-### useApi Hook (`anime-site/src/hooks/useApi.js`)
-
-```js
-{
-  data: any | null,
-  loading: boolean,
-  error: Error | null,
-  refetch: () => Promise<void>,
-}
-```
-
-- Принимает `fetcher` функцию и опциональный `deps` массив
-- Автоматически вызывает `fetcher` при изменении `deps`
-
-### Локальный стейт страниц
-
-| Страница | Локальный стейт |
-|----------|----------------|
-| `Catalog.jsx` | filters (сортировка, тип, статус, жанры, год, сезоны), anime list, pagination cursor, loadingMore |
-| `AnimeDetail.jsx` | anime data, recommendations, comments list, bookmark status, user rating, tab state |
-| `Watch.jsx` | episode data, selected dubbing/player/episode, progress seconds, `kodik` iframe state, createRoomData |
-| `Profile.jsx` | profile data (user, stats, achievements, bookmarks, history, friends, comments), edit mode, avatar editor state |
-| `Rooms.jsx` | rooms list, create form, join form |
-| `RoomWatch.jsx` | room state, sync polling interval, WebSocket connection, chat messages, anime search, video iframe + postMessage |
-| `Friends.jsx` | friends list, pending requests (in/out), search results |
-| `Library.jsx` | bookmarks grouped by status, active tab |
-| `Schedule.jsx` | schedule data grouped by day, active day tab |
-
-## Server-Side State (Database)
-
-### Геймификация (вычисляется, не хранится)
-
-**XP** вычисляется из активностей:
-- 10 XP за просмотренный эпизод
-- 1 XP за минуту просмотра
-- 5 XP за оценку
-- 8 XP за комментарий
-- 3 XP за закладку
-- 15 XP за друга
-
-**Уровень**: `Math.floor(Math.sqrt(totalXp / 100)) + 1`
-
-**Достижения** (10 шт., проверяются при запросе профиля):
-- 👶 Первый шаг — первый просмотренный эпизод
-- 🍿 Запойщик — 10 эпизодов
-- 🎬 Машина — 100 эпизодов
-- ⏰ 24 часа — 86400+ секунд просмотра
-- ⭐ Критик — 5+ оценок
-- 💬 Болтун — 10+ комментариев
-- 👑 Коллекционер — 20+ закладок
-- 🤝 Душа компании — 5+ друзей
-- 🌟 Популярный — 20+ лайков на комментариях
-- 🥚 Re:Zero S4 — просмотр любого эпизода Re:Zero S4 (скрытое)
-
-**Рамки аватаров** разблокируются по уровню:
-- Уровень 1: Нет рамки
-- Уровень 5: Mint
-- Уровень 10: Lavender
-- Уровень 15: Peach
-- Уровень 20: Rose
-- Уровень 30: Gold
-- Уровень 40: Aurora
-- Уровень 50: Legend
-
-### Watch Room State (WebSocket)
-
-Состояние комнаты рассылается через WebSocket события:
-- `room:snapshot` — полное состояние при подключении (участники, текущее видео, позиция, сообщения)
-- `room:state` — изменение состояния плеера (время, пауза, видео)
-- `room:members` — изменение списка участников
-- `room:message` — новое сообщение чата
-
-Сервер хранит версионность (`stateVersion`, `membersVersion`, `lastMessageId`) для обнаружения рассинхрона. Клиент синхронизируется через WebSocket, с HTTP polling как fallback.
-
-## Persistence
-
-| Что | Где | Формат |
-|-----|-----|--------|
-| Данные БД | `server/data/qik-anime.db` | SQLite (бинарный) |
-| JWT токен | `localStorage` (браузер) | `qik_token` |
-| Пользователь | `localStorage` (браузер) | `qik_user` (JSON) |
-| Тема | `localStorage` (браузер) | `theme` ('dark'/'light') |
-| Загруженные файлы | `server/uploads/` | Изображения (jpg/png/gif/webp) |
+- Тестов и линтера нет — проверка руками + успешная сборка обоих пакетов
+- sql.js: нет настоящих транзакций; TypeORM `synchronize: true`, миграций нет
+- `static.yani.tv` заблокирован в РФ — постеры через `imgproxy.yani.tv` (`fixUrl()`)
+- Нативные зависимости запрещены (сборка должна работать без VS Build Tools)
+- Комнаты закрыты для обычных пользователей — это фича, не баг

@@ -8,6 +8,8 @@
 
 Прод живой: https://quickik.ru (автодеплой из `main`: GitHub Actions → VPS → PM2 `anime-api` + nginx). Активная разработка.
 
+Фронтенд на 97% в FSD (`apps/frontend/`): пройдено 5 волн — shared, entities, widgets, features, app/providers, pages. В `anime-site/src/` остались только App.jsx, main.jsx, index.css. Механика — алиасы `@fsd`/`@legacy` в vite.config, см. ARCHITECTURE.md и FSD_MIGRATION.md.
+
 ## Что реализовано
 
 - **Каталог и просмотр**: YummyAnime API; плееры Kodik (iframe) и AniLibria (HLS.js), сохранение выбранного плеера/озвучки/серии; расписание; поиск с историей

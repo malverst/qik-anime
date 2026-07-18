@@ -2,11 +2,11 @@
 
 ## Project Overview
 
-QIK Anime — full-stack приложение для просмотра и отслеживания аниме. Состоит из React SPA (`anime-site/`) и NestJS бэкенда (`server/`). Данные об аниме берутся из внешнего YummyAnime API (https://yani.tv). Бэкенд добавляет социальные и геймификационные фичи: пользователи, закладки, рейтинги (аниме и OP/ED), комментарии, прогресс просмотра, друзья, личные чаты, уведомления (вкл. web-push), совместные комнаты просмотра, эмодзи-квиз, баг-репорты, история поиска, админка с аудит-логом.
+QIK Anime — full-stack приложение для просмотра и отслеживания аниме. Состоит из React SPA (`apps/frontend/`, FSD-архитектура) и NestJS бэкенда (`apps/backend/`). Данные об аниме берутся из внешнего YummyAnime API (https://yani.tv). Бэкенд добавляет социальные и геймификационные фичи: пользователи, закладки, рейтинги (аниме и OP/ED), комментарии, прогресс просмотра, друзья, личные чаты, уведомления (вкл. web-push), совместные комнаты просмотра, эмодзи-квиз, баг-репорты, история поиска, админка с аудит-логом.
 
 ## Tech Stack
 
-- **Frontend**: React 18, Vite 5, React Router, Socket.IO Client, HLS.js, чистый CSS (без библиотек)
+- **Frontend**: React 18, Vite 5, React Router, Socket.IO Client, HLS.js, чистый CSS (без библиотек), FSD-архитектура
 - **Backend**: NestJS 10, TypeORM, sql.js (SQLite через WebAssembly), Passport JWT, Socket.IO
 - **Database**: SQLite (файл `server/data/qik-anime.db`, автосинхронизация через TypeORM `synchronize: true`)
 
@@ -14,12 +14,12 @@ QIK Anime — full-stack приложение для просмотра и от�
 
 ```bash
 # Frontend (из корня)
-cd anime-site && npm run dev     # Dev сервер на :5173
-cd anime-site && npm run build   # Production build
+cd apps/frontend && npm run dev     # Dev сервер на :5173
+cd apps/frontend && npm run build   # Production build
 
 # Backend (из корня)
-cd server && npm run dev         # Dev сервер на :3001 (nest start --watch)
-cd server && npm run build       # Компиляция TypeScript
+cd apps/backend && npm run dev     # Dev сервер на :3001 (nest start --watch)
+cd apps/backend && npm run build   # Компиляция TypeScript
 ```
 
 ---
@@ -92,8 +92,8 @@ VAPID_PRIVATE_KEY=<ключ web-push>
 # На сервере
 cd /root/qik-anime
 git pull origin main
-cd anime-site && npm ci && npm run build && cp -r dist/* /var/www/quickik.ru/
-cd ../server && npm ci --omit=dev && npm run build && pm2 reload anime-api
+cd apps/frontend && npm ci && npm run build && cp -r dist/* /var/www/quickik.ru/
+cd ../apps/backend && npm ci --omit=dev && npm run build && pm2 reload anime-api
 ```
 
 ### Структура сервера
@@ -120,16 +120,17 @@ cd ../server && npm ci --omit=dev && npm run build && pm2 reload anime-api
 
 ## Project Conventions
 
-### Frontend
-- Компоненты в `anime-site/src/components/`, страницы в `pages/`
-- Стейт через React Context (`AuthContext`, `ThemeContext`), без Redux
-- Запросы к API через функции в `api/backend.js` (бэкенд) и `api/client.js` (YummyAnime)
-- Стили в одном файле `styles/index.css` (~2850 строк), CSS-переменные для тёмной/светлой темы
-- Хук `useApi` для fetch с loading/error состоянием
-- HLS.js для воспроизведения .m3u8 стримов (AniLibria)
+### Frontend (FSD в `apps/frontend/src/`)
+- Слои: `app/`, `pages/`, `widgets/`, `features/`, `entities/`, `shared/` (см. ARCHITECTURE.md)
+- Импорты через алиас `@fsd` (→ `src/`)
+- Стейт через React Context (`app/providers/`), без Redux
+- Запросы к API через `shared/api/backend.js` и `shared/api/client.js`
+- Стили в `app/styles/index.css`, CSS-переменные; в перспективе Tailwind
+- Хук `useApi` в `shared/lib/`
+- HLS.js для .m3u8 стримов
 
 ### Backend
-- Модульная структура: каждый модуль в своей папке внутри `server/src/`
+- Модульная структура: каждый модуль в своей папке внутри `apps/backend/src/`
 - JWT аутентификация через Passport (токен в `Authorization: Bearer <token>`)
 - Декоратор `@CurrentUser()` для получения пользователя в контроллерах
 - `CompositeAuthGuard` — основной guard на защищённых роутах: пропускает по JWT ИЛИ по server-to-server API-токену (таблица `api_tokens`, `ApiTokenGuard`)

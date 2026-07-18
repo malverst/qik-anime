@@ -6,28 +6,28 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 QIK Anime (quickik.ru) — full-stack аниме-трекер: каталог/просмотр аниме + социальные фичи и геймификация. Два независимых источника данных:
 
-- **YummyAnime API** (`api.yani.tv`) — каталог аниме, серии, поиск, расписание. Клиент: `anime-site/src/api/client.js`
-- **Собственный NestJS бэкенд** (`server/`) — пользователи, закладки, рейтинги, комментарии, друзья, чаты, комнаты, XP. Клиент: `anime-site/src/api/backend.js`
+- **YummyAnime API** (`api.yani.tv`) — каталог аниме, серии, поиск, расписание. Клиент: `apps/frontend/src/shared/api/client.js`
+- **Собственный NestJS бэкенд** (`server/`) — пользователи, закладки, рейтинги, комментарии, друзья, чаты, комнаты, XP. Клиент: `apps/frontend/src/shared/api/backend.js`
 
-Данные из двух источников сливаются на уровне страниц.
+Данные из двух источников сливаются на уровне страниц. Фронтенд мигрирован на FSD (см. `FSD_MIGRATION.md`).
 
 ## Команды
 
 ```bash
 # Frontend (React 18 + Vite, порт 5173, dev-прокси /api → :3001)
-cd anime-site && npm run dev
-cd anime-site && npm run build
+cd apps/frontend && npm run dev
+cd apps/frontend && npm run build
 
 # Backend (NestJS, порт 3001, глобальный префикс /api)
-cd server && npm run dev          # nest start --watch (НЕ start:dev — такого скрипта нет)
-cd server && npm run build
+cd apps/backend && npm run dev     # nest start --watch (НЕ start:dev — такого скрипта нет)
+cd apps/backend && npm run build
 ```
 
 Тестов и линтера в проекте нет. Проверка = ручной прогон в браузере + успешная сборка обоих пакетов.
 
 ## Архитектура
 
-### Backend (`server/src/`)
+### Backend (`apps/backend/src/`)
 
 - **17 модулей**, каждый в своей папке: auth, users, bookmarks, ratings (вкл. OP/ED-рейтинги `OpeningRating`), comments, progress, friends, uploads, notifications, suggestions, watch-rooms, chats, admin (+ audit-log), quiz (эмодзи-квиз через DeepSeek API), push (web-push), search-history, issues (баг-репорты)
 - Структура модуля: `<name>.module.ts` / `.controller.ts` / `.service.ts` / `.entity.ts` / `dto.ts`
@@ -39,15 +39,17 @@ cd server && npm run build
 - Валидация только через DTO + `class-validator` (глобальный `ValidationPipe` с `whitelist: true`)
 - Пути (`DB_PATH`, `UPLOAD_DIR_ABSOLUTE`) — только через `common/runtime-paths.ts`, не хардкодить
 
-### Frontend (`anime-site/src/`)
+### Frontend (`apps/frontend/src/`) — FSD-архитектура
 
-- Страницы в `pages/`, переиспользуемые компоненты в `components/`; PascalCase для компонентов, camelCase для утилит/хуков
-- **Все стили в одном файле `styles/index.css`** (~3000+ строк). Никаких CSS-модулей и отдельных файлов. CSS-переменные дизайн-системы: `--surface`, `--surface-secondary`, `--text`, `--text-secondary`, `--accent`, `--accent-secondary`. Светлая тема — селектор `[data-theme='light']`
-- **Без Redux**: глобальный стейт — React Context (`AuthContext`, `ThemeContext`), fetch — хук `useApi`
-- **Никаких fetch в компонентах** — только через функции `api/backend.js` и `api/client.js`
-- Иконки — inline SVG в `components/icons.jsx`, иконочные библиотеки не подключать
-- Модалки (`AuthModal`, `SuggestModal`, dropdown `BookmarkButton`), `Toast`, `Lightbox` — через `ReactDOM.createPortal`
+Слои: `app/` (провайдеры, роутер, стили), `pages/` (18 страниц), `widgets/`, `features/`, `entities/`, `shared/` (api, ui, lib). Подробнее — `ARCHITECTURE.md` и `FSD_MIGRATION.md`.
+
+- **Все стили в одном файле `app/styles/index.css`** (~3000+ строк). Никаких CSS-модулей. CSS-переменные: `--surface`, `--surface-secondary`, `--text`, `--text-secondary`, `--accent`, `--accent-secondary`. Светлая тема — `[data-theme='light']`. В перспективе Tailwind.
+- **Без Redux**: глобальный стейт — React Context (`app/providers`), fetch — хук `useApi` (`shared/lib`)
+- **Никаких fetch в компонентах** — только через `shared/api/backend.js` и `shared/api/client.js`
+- Иконки — `shared/ui/icons.jsx`, иконочные библиотеки не подключать
+- Модалки и порталы — через `ReactDOM.createPortal`
 - Видео: HLS.js для `.m3u8` стримов AniLibria
+- Алиас `@fsd` → `src/` (vite.config.js)
 
 ### Ключевые паттерны
 
@@ -60,7 +62,7 @@ cd server && npm run build
 
 **Пуш в `main` = автодеплой в прод** (GitHub Actions → rsync на VPS → PM2 `anime-api` + nginx, quickik.ru). Не пушить без явной команды пользователя.
 
-- `server/data/` (БД) и `server/uploads/` исключены из rsync — не трогать
+- `server/data/` (БД) и `server/uploads/` исключены из rsync — не трогать (на сервере пути `/root/qik-anime/server/...` без изменений)
 - `.env` существует только на сервере (`/root/qik-anime/server/.env`): `PORT`, `JWT_SECRET`, `DB_PATH`, `UPLOAD_DIR`, `CORS_ORIGINS`, `ADMIN_SECRET`, `DEEPSEEK_TOKEN`
 - Полный runbook (что ломается и как чинить, ручной деплой, бэкапы БД) — в `AGENTS.md`
 

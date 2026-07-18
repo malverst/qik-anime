@@ -147,6 +147,55 @@ AppModule
 - Глобальный стейт: `AuthContext`, `ThemeContext`; fetch через хук `useApi`
 - Плеер: утилиты в `utils/` (`kodikPlayer.js`, `playerApi.js`, `frames.js`), HLS.js для `.m3u8` стримов
 
+## FSD-структура фронтенда (apps/frontend)
+
+Фронтенд поэтапно мигрирует из `anime-site/` в `apps/frontend/` на [Feature-Sliced Design](https://feature-sliced.design). Статус: создан каркас слоёв, код пока живёт в `anime-site/`. Слой `processes` не используется (deprecated в FSD 2.0).
+
+### Слои (`apps/frontend/src/`)
+
+**`app/`** — инициализация приложения. Не содержит бизнес-логики.
+- `app/providers/` — провайдеры контекстов (`AuthContext`, `ThemeContext`)
+- `app/router/` — роутер и список маршрутов (сейчас внутри `App.jsx`)
+- `app/styles/` — глобальные стили (`index.css` переезжает сюда целиком; в перспективе стили переводятся на Tailwind, распил чистого CSS по слайсам не планируется)
+- точка входа `main.jsx`, корневой `App`
+
+**`pages/`** — по слайсу на маршрут: `home`, `catalog`, `schedule`, `search`, `library`, `settings`, `friends`, `chats`, `rooms`, `room-watch`, `profile`, `anime-detail`, `watch`, `admin`, `quiz`, `issues`, `ratings`, `not-found`. Страница только собирает виджеты и фичи + разметка лейаута; бизнес-логики по минимуму.
+
+**`widgets/`** — крупные самостоятельные блоки, переиспользуемые между страницами или составляющие заметную часть страницы: шапка, нижний навбар, футер, секция комментариев, «продолжить просмотр», хиро-баннер, колокольчик уведомлений.
+
+**`features/`** — интерактивные пользовательские сценарии («что юзер делает»): авторизация, добавление в закладки, оценка аниме, оценка OP/ED, предложение аниме другу, переключение темы, подписка на push.
+
+**`entities/`** — бизнес-сущности: данные + их отображение, без пользовательских сценариев. Кандидаты: `anime` (карточка, типы, работа с постерами), `user` (аватар, мини-карточка), `comment`, `notification`.
+
+**`shared/`** — код без привязки к бизнес-домену:
+- `shared/api/` — HTTP-клиенты (`backend.js`, `client.js`), socket.io-клиент
+- `shared/ui/` — UI-примитивы без бизнес-смысла: иконки, Toast, Lightbox, Carousel, Section, GlassSurface, SEO
+- `shared/lib/` — хуки (`useApi`) и утилиты (`time.js`, `frames.js`, `playerApi.js`, `kodikPlayer.js`)
+- `shared/config/` — константы, доступ к env
+
+### Правила импортов
+
+1. Только сверху вниз: `app → pages → widgets → features → entities → shared`. Нижний слой ничего не знает о верхних.
+2. Слайсы одного слоя не импортируют друг друга.
+3. Слайс = папка с сегментами `ui/`, `model/`, `api/`, `lib/` (по необходимости) и публичным API `index.js`. Импорт извне слайса — только через его `index.js`.
+4. Имена слайсов — kebab-case.
+
+### Маппинг текущего кода → FSD
+
+| Сейчас (`anime-site/src/`) | Куда |
+|---------------------------|------|
+| `context/AuthContext.jsx`, `context/ThemeContext.jsx` | `app/providers/` |
+| маршруты из `App.jsx` | `app/router/` |
+| `styles/index.css` | `app/styles/` |
+| `pages/*` (18 шт.) | `pages/<slug>/` |
+| `Header`, `GlassNav`, `Footer`, `Hero`, `Comments`, `ContinueWatching`, `NotificationBell` | `widgets/` |
+| `AuthModal`, `BookmarkButton`, `RatingWidget`, `OpeningRatingWidget`, `SuggestModal` | `features/` |
+| `AnimeCard`, `Avatar` | `entities/` |
+| `icons.jsx`, `Toast`, `Lightbox`, `Carousel`, `Section`, `GlassSurface`, `SEO` | `shared/ui/` |
+| `api/backend.js`, `api/client.js` | `shared/api/` |
+| `hooks/useApi.js`, `utils/*` | `shared/lib/` |
+| `QuizEmoji`, `QuizFrames` | решить при переносе (features `quiz-*` или widgets) |
+
 ## Environment Variables
 
 ### Server (.env)
